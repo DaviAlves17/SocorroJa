@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SocorroJá - Encontre o hospital mais próximo</title>
+  <link rel="manifest" href="manifest.json">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f8ff;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      color: #0a74da;
+      text-align: center;
+    }
+    .hospital {
+      background-color: #ffffff;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    .hospital h2 {
+      margin-top: 0;
+    }
+    .btn {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 10px 15px;
+      background-color: #0a74da;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+      cursor: pointer;
+      border: none;
+      font-size: 1em;
+    }
+    .localizacao {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+  </style>
+</head>
+<body>
+  <h1>SocorroJá</h1>
+
+  <div class="localizacao">
+    <p><strong>Sua localização:</strong></p>
+    <p id="coords">Carregando...</p>
+    <button type="button" onclick="buscarHospitais()" class="btn">Ver hospitais próximos</button>
+  </div>
+
+  <div class="hospital">
+    <h2>Casa de Caridade de Carangola</h2>
+    <p><strong>Endereço:</strong> Praça Coronel João Marcelino, 26, Centro</p>
+    <p><strong>Telefone:</strong> (32) 3741-6950</p>
+    <p><strong>Horário de Atendimento:</strong> 24h</p>
+    <a href="https://maps.app.goo.gl/tUM5Kw1edhwzxzJG6" target="_blank" class="btn">Ver Rota no Mapa</a>
+  </div>
+
+  <div class="hospital">
+    <h2>Hospital Evangélico de Carangola</h2>
+    <p><strong>Endereço:</strong> R. Abílio Coimbra, 359, Triângulo</p>
+    <p><strong>Telefone:</strong> (32) 3741-2441</p>
+    <p><strong>Horário de Atendimento:</strong> 24h</p>
+    <a href="https://maps.app.goo.gl/VqRxtYejro1wwEa5A" target="_blank" class="btn">Ver Rota no Mapa</a>
+  </div>
+
+  <script>
+    // Mostra a localização assim que a página carrega
+    window.onload = function() {
+      if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+          const lat = position.coords.latitude;
+          const lon = position.coords.longitude;
+          document.getElementById("coords").innerText = `Latitude: ${lat.toFixed(4)} / Longitude: ${lon.toFixed(4)}`;
+        }, function(error) {
+          document.getElementById("coords").innerText = "Não foi possível obter sua localização.";
+        });
+      } else {
+        document.getElementById("coords").innerText = "Seu navegador não suporta geolocalização.";
+      }
+    };
+
+    // Função para buscar hospitais próximos
+    function buscarHospitais() {
+      if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+          const lat = position.coords.latitude;
+          const lon = position.coords.longitude;
+          const url = `https://www.google.com/maps/search/hospitais/@${lat},${lon},15z`;
+          window.open(url, "_blank");
+        }, function(error) {
+          alert("Não foi possível obter sua localização.");
+        });
+      } else {
+        alert("Seu navegador não suporta geolocalização.");
+      }
+    }
+  </script>
+</body>
+</html>
