@@ -38,6 +38,12 @@
       border: none;
       font-size: 1em;
     }
+    .btn-tel {
+      background-color: #28a745;
+      margin-left: 10px;
+      font-size: 0.95em;
+      padding: 7px 12px;
+    }
     .localizacao {
       text-align: center;
       margin-bottom: 30px;
@@ -50,65 +56,77 @@
       background-color: #22223b;
       margin: 5px 5px 0 5px;
     }
+    #hospitais-lista {
+      margin-top: 20px;
+    }
   </style>
 </head>
 <body>
   <h1>SocorroJá</h1>
 
   <div class="localizacao">
-    <p><strong>Sua localização:</strong></p>
-    <p id="coords">Carregando...</p>
-    <button type="button" onclick="buscarHospitais()" class="btn">Ver hospitais próximos</button>
-    <br><br>
+    <p><strong>Buscando hospitais próximos...</strong></p>
     <button type="button" class="btn btn-emergencia" onclick="window.location.href='tel:192'">Ligar para o SAMU (192)</button>
     <button type="button" class="btn btn-policia" onclick="window.location.href='tel:190'">Ligar para a Polícia (190)</button>
   </div>
 
-  <div class="hospital">
-    <h2>Casa de Caridade de Carangola</h2>
-    <p><strong>Endereço:</strong> Praça Coronel João Marcelino, 26, Centro</p>
-    <p><strong>Telefone:</strong> (32) 3741-6950</p>
-    <p><strong>Horário de Atendimento:</strong> 24h</p>
-    <a href="https://maps.app.goo.gl/tUM5Kw1edhwzxzJG6" target="_blank" class="btn">Ver Rota no Mapa</a>
-  </div>
-
-  <div class="hospital">
-    <h2>Hospital Evangélico de Carangola</h2>
-    <p><strong>Endereço:</strong> R. Abílio Coimbra, 359, Triângulo</p>
-    <p><strong>Telefone:</strong> (32) 3741-2441</p>
-    <p><strong>Horário de Atendimento:</strong> 24h</p>
-    <a href="https://maps.app.goo.gl/VqRxtYejro1wwEa5A" target="_blank" class="btn">Ver Rota no Mapa</a>
+  <div id="hospitais-lista">
+    <!-- Lista de hospitais será exibida aqui -->
   </div>
 
   <script>
-    // Mostra a localização assim que a página carrega
+    // Lista fixa de hospitais salvos no site
+    const hospitaisSalvos = [
+      {
+        nome: "Casa de Caridade de Carangola",
+        endereco: "Praça Coronel João Marcelino, 26, Centro",
+        telefone: "(32) 3741-6950",
+        telLink: "tel:+553237416950",
+        horario: "24h",
+        rota: "https://maps.app.goo.gl/tUM5Kw1edhwzxzJG6"
+      },
+      {
+        nome: "Hospital Evangélico de Carangola",
+        endereco: "R. Abílio Coimbra, 359, Triângulo",
+        telefone: "(32) 3741-2441",
+        telLink: "tel:+553237412441",
+        horario: "24h",
+        rota: "https://maps.app.goo.gl/VqRxtYejro1wwEa5A"
+      }
+    ];
+
+    // Função para exibir hospitais salvos
+    function mostrarHospitais() {
+      const lista = document.getElementById('hospitais-lista');
+      lista.innerHTML = '';
+      hospitaisSalvos.forEach(hospital => {
+        const div = document.createElement('div');
+        div.className = 'hospital';
+        div.innerHTML = `
+          <h2>${hospital.nome}</h2>
+          <p><strong>Endereço:</strong> ${hospital.endereco}</p>
+          <p>
+            <strong>Telefone:</strong> ${hospital.telefone}
+            <a href="${hospital.telLink}" class="btn btn-tel">Ligar</a>
+          </p>
+          <p><strong>Horário de Atendimento:</strong> ${hospital.horario}</p>
+          <a href="${hospital.rota}" target="_blank" class="btn">Ver Rota no Mapa</a>
+        `;
+        lista.appendChild(div);
+      });
+    }
+
+    // Busca automática pela localização e exibe hospitais
     window.onload = function() {
       if ("geolocation" in navigator) {
         navigator.geolocation.getCurrentPosition(function(position) {
-          const lat = position.coords.latitude;
-          const lon = position.coords.longitude;
-          document.getElementById("coords").innerText = `Latitude: ${lat.toFixed(4)} / Longitude: ${lon.toFixed(4)}`;
+          // Aqui você pode usar a localização para buscar hospitais dinâmicos se quiser
+          mostrarHospitais();
         }, function(error) {
-          document.getElementById("coords").innerText = "Não foi possível obter sua localização.";
+          document.getElementById('hospitais-lista').innerHTML = "<p>Não foi possível obter sua localização. Exibindo hospitais cadastrados.</p>";
+          mostrarHospitais();
         });
       } else {
-        document.getElementById("coords").innerText = "Seu navegador não suporta geolocalização.";
+        document.getElementById('hospitais-lista').innerHTML = "<p>Seu navegador não suporta geolocalização. Exibindo hospitais cadastrados.</p>";
+        mostrarHospitais();
       }
-    };
-
-    // Função para buscar hospitais próximos
-    function buscarHospitais() {
-      if ("geolocation" in navigator) {
-        navigator.geolocation.getCurrentPosition(function(position) {
-          const lat = position.coords.latitude;
-          const lon = position.coords.longitude;
-          const url = `https://www.google.com/maps/search/hospitais/@${lat},${lon},15z`;
-          window.open(url, "_blank");
-        }, function(error) {
-          alert("Não foi possível obter sua localização.");
-        });
-      } else {
-        alert("Seu navegador não suporta geolocalização.");
-      }
-    }
-  </script>
