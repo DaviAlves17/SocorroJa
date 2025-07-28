@@ -124,6 +124,12 @@
     .hospital .btn {
       margin-top: 12px;
     }
+    .loading {
+      text-align: center;
+      color: var(--primary);
+      font-size: 1.1em;
+      margin-top: 30px;
+    }
     @media (max-width: 700px) {
       .container {
         margin: 16px 4px;
@@ -142,7 +148,7 @@
   </header>
   <div class="container">
     <div class="localizacao">
-      <p><strong>Buscando hospitais próximos...</strong></p>
+      <p id="status-busca"><strong>Buscando hospitais próximos...</strong></p>
       <button type="button" class="btn btn-emergencia" onclick="window.location.href='tel:192'">Ligar para o SAMU (192)</button>
       <button type="button" class="btn btn-policia" onclick="window.location.href='tel:190'">Ligar para a Polícia (190)</button>
     </div>
@@ -172,43 +178,90 @@
     ];
 
     // Função para exibir hospitais salvos
-    function mostrarHospitais() {
+    function mostrarHospitais(hospitais, titulo = "Hospitais cadastrados próximos de você:") {
       const lista = document.getElementById('hospitais-lista');
-      lista.innerHTML = '';
-      hospitaisSalvos.forEach(hospital => {
-        const div = document.createElement('div');
-        div.className = 'hospital';
-        div.innerHTML = `
-          <h2>${hospital.nome}</h2>
-          <p><strong>Endereço:</strong> ${hospital.endereco}</p>
-          <p>
-            <strong>Telefone:</strong> ${hospital.telefone}
-            <a href="${hospital.telLink}" class="btn btn-tel" title="Ligar para ${hospital.nome}">Ligar</a>
-          </p>
-          <p><strong>Horário de Atendimento:</strong> ${hospital.horario}</p>
-          <a href="${hospital.rota}" target="_blank" class="btn" title="Ver rota no Google Maps">Ver Rota no Mapa</a>
+      let html = `<h3 style="text-align:center;color:#0a74da;margin-bottom:18px;">${titulo}</h3>`;
+      hospitais.forEach(hospital => {
+        html += `
+          <div class="hospital">
+            <h2>${hospital.nome}</h2>
+            <p><strong>Endereço:</strong> ${hospital.endereco}</p>
+            <p>
+              <strong>Telefone:</strong> ${hospital.telefone}
+              <a href="${hospital.telLink}" class="btn btn-tel" title="Ligar para ${hospital.nome}">Ligar</a>
+            </p>
+            <p><strong>Horário de Atendimento:</strong> ${hospital.horario}</p>
+            <a href="${hospital.rota}" target="_blank" class="btn" title="Ver rota no Google Maps">Ver Rota no Mapa</a>
+          </div>
         `;
-        lista.appendChild(div);
+      });
+      lista.innerHTML = html;
+    }
+
+    // Função para buscar hospitais gratuitos usando Overpass API (OpenStreetMap)
+    function buscarHospitaisOSM(lat, lon) {
+      const statusBusca = document.getElementById('status-busca');
+      statusBusca.textContent = "Buscando hospitais próximos na sua região...";
+      const radius = 5000; // 5km
+      const query = `
+        [out:json];
+        (
+          node["amenity"="hospital"](around:${radius},${lat},${lon});
+          way["amenity"="hospital"](around:${radius},${lat},${lon});
+          relation["amenity"="hospital"](around:${radius},${lat},${lon});
+        );
+        out center;
+      `;
+      fetch("https://overpass-api.de/api/interpreter", {
+        method: "POST",
+        body: query,
+        headers: {
+          "Content-Type": "text/plain"
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.elements && data.elements.length > 0) {
+          const hospitais = data.elements.map(el => {
+            const nome = el.tags && el.tags.name ? el.tags.name : "Hospital próximo";
+            const endereco = [
+              el.tags && el.tags["addr:street"] ? el.tags["addr:street"] : "",
+              el.tags && el.tags["addr:housenumber"] ? el.tags["addr:housenumber"] : "",
+              el.tags && el.tags["addr:suburb"] ? el.tags["addr:suburb"] : "",
+              el.tags && el.tags["addr:city"] ? el.tags["addr:city"] : ""
+            ].filter(Boolean).join(", ");
+            const telefone = el.tags && el.tags.phone ? el.tags.phone : "Não informado";
+            const telLink = telefone !== "Não informado" ? `tel:${telefone.replace(/[^+\d]/g, "")}` : "#";
+            const horario = el.tags && el.tags.opening_hours ? el.tags.opening_hours : "Não informado";
+            const rota = `https://www.google.com/maps/search/?api=1&query=${el.lat || el.center.lat},${el.lon || el.center.lon}`;
+            return { nome, endereco, telefone, telLink, horario, rota };
+          });
+          statusBusca.textContent = "";
+          mostrarHospitais(hospitais, "Hospitais encontrados próximos de você:");
+        } else {
+          statusBusca.innerHTML = "<span style='color:#d90429;'>Nenhum hospital encontrado na sua região. Exibindo hospitais cadastrados.</span>";
+          mostrarHospitais(hospitaisSalvos);
+        }
+      })
+      .catch(() => {
+        statusBusca.innerHTML = "<span style='color:#d90429;'>Erro ao buscar hospitais. Exibindo hospitais cadastrados.</span>";
+        mostrarHospitais(hospitaisSalvos);
       });
     }
 
-    // Busca automática pela localização e abre o Google Maps com hospitais próximos
+    // Busca automática pela localização e exibe hospitais
     window.onload = function() {
+      const statusBusca = document.getElementById('status-busca');
       if ("geolocation" in navigator) {
         navigator.geolocation.getCurrentPosition(function(position) {
-          // Abre o Google Maps automaticamente com hospitais próximos
-          const lat = position.coords.latitude;
-          const lon = position.coords.longitude;
-          const url = `https://www.google.com/maps/search/hospitais/@${lat},${lon},15z`;
-          window.open(url, "_blank");
-          mostrarHospitais();
+          buscarHospitaisOSM(position.coords.latitude, position.coords.longitude);
         }, function(error) {
-          document.getElementById('hospitais-lista').innerHTML = "<p style='color:#d90429;text-align:center;'>Não foi possível obter sua localização. Exibindo hospitais cadastrados.</p>";
-          mostrarHospitais();
+          statusBusca.innerHTML = "<span style='color:#d90429;'>Não foi possível obter sua localização. Exibindo hospitais cadastrados.</span>";
+          mostrarHospitais(hospitaisSalvos);
         });
       } else {
-        document.getElementById('hospitais-lista').innerHTML = "<p style='color:#d90429;text-align:center;'>Seu navegador não suporta geolocalização. Exibindo hospitais cadastrados.</p>";
-        mostrarHospitais();
+        statusBusca.innerHTML = "<span style='color:#d90429;'>Seu navegador não suporta geolocalização. Exibindo hospitais cadastrados.</span>";
+        mostrarHospitais(hospitaisSalvos);
       }
     };
   </script>
