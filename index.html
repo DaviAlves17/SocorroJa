@@ -30,6 +30,7 @@
       text-align: center;
       box-shadow: var(--shadow);
       border-radius: 0 0 var(--radius) var(--radius);
+      position: relative;
     }
     header h1 {
       font-family: 'Montserrat', Arial, sans-serif;
@@ -37,6 +38,88 @@
       margin: 0;
       letter-spacing: 1px;
       font-weight: 700;
+    }
+    .menu-btn {
+      position: absolute;
+      left: 24px;
+      top: 32px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      z-index: 1001;
+    }
+    .menu-btn span,
+    .menu-btn span:before,
+    .menu-btn span:after {
+      display: block;
+      background: var(--white);
+      height: 4px;
+      width: 32px;
+      border-radius: 2px;
+      position: relative;
+      transition: all 0.3s;
+    }
+    .menu-btn span:before,
+    .menu-btn span:after {
+      content: '';
+      position: absolute;
+      left: 0;
+    }
+    .menu-btn span:before {
+      top: -10px;
+    }
+    .menu-btn span:after {
+      top: 10px;
+    }
+    .side-menu {
+      position: fixed;
+      top: 0;
+      left: -320px;
+      width: 300px;
+      height: 100%;
+      background: var(--white);
+      box-shadow: 2px 0 16px rgba(10, 116, 218, 0.10);
+      z-index: 1002;
+      transition: left 0.3s;
+      padding: 32px 18px 18px 18px;
+      overflow-y: auto;
+      border-radius: 0 var(--radius) var(--radius) 0;
+    }
+    .side-menu.open {
+      left: 0;
+    }
+    .side-menu h2 {
+      color: var(--primary);
+      font-family: 'Montserrat', Arial, sans-serif;
+      font-size: 1.3rem;
+      margin-top: 0;
+      margin-bottom: 18px;
+      font-weight: 700;
+    }
+    .side-menu ul {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 24px 0;
+    }
+    .side-menu li {
+      margin-bottom: 10px;
+      font-size: 1.08em;
+      color: #333;
+    }
+    .side-menu .submenu {
+      margin-left: 18px;
+      margin-top: 4px;
+      margin-bottom: 10px;
+    }
+    .side-menu .close-btn {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      background: none;
+      border: none;
+      font-size: 1.7em;
+      color: var(--primary);
+      cursor: pointer;
     }
     .container {
       max-width: 600px;
@@ -138,14 +221,54 @@
       header {
         padding: 22px 0 14px 0;
       }
+      .side-menu {
+        width: 90vw;
+        left: -95vw;
+      }
+      .side-menu.open {
+        left: 0;
+      }
     }
   </style>
 </head>
 <body>
   <header>
+    <button class="menu-btn" id="menuBtn" aria-label="Abrir menu">
+      <span></span>
+    </button>
     <h1>SocorroJá</h1>
     <p style="font-size:1.15rem;font-weight:500;margin-top:10px;opacity:.95;">Encontre rapidamente hospitais e serviços de emergência próximos</p>
   </header>
+
+  <nav class="side-menu" id="sideMenu" aria-label="Menu lateral">
+    <button class="close-btn" id="closeMenuBtn" aria-label="Fechar menu">&times;</button>
+    <h2>Menu</h2>
+    <ul>
+      <li>
+        <strong>Hospitais parceiros</strong>
+        <ul class="submenu">
+          <li>Médicos</li>
+          <li>Leitos disponíveis</li>
+          <li>Transporte de ambulância</li>
+        </ul>
+      </li>
+      <li>
+        <strong>Clínicas parceiras</strong>
+        <ul class="submenu">
+          <li>Agendamento presencial</li>
+          <li>Teleconsulta</li>
+        </ul>
+      </li>
+      <li>
+        <strong>Equipamentos hospitalares</strong>
+        <ul class="submenu">
+          <li>Aluguéis</li>
+          <li>Venda</li>
+        </ul>
+      </li>
+    </ul>
+  </nav>
+
   <div class="container">
     <div class="localizacao">
       <p id="status-busca"><strong>Buscando hospitais próximos...</strong></p>
@@ -157,6 +280,19 @@
     </div>
   </div>
   <script>
+    // Menu lateral
+    const menuBtn = document.getElementById('menuBtn');
+    const sideMenu = document.getElementById('sideMenu');
+    const closeMenuBtn = document.getElementById('closeMenuBtn');
+    menuBtn.onclick = () => sideMenu.classList.add('open');
+    closeMenuBtn.onclick = () => sideMenu.classList.remove('open');
+    // Fecha menu ao clicar fora dele
+    window.onclick = function(e) {
+      if (sideMenu.classList.contains('open') && !sideMenu.contains(e.target) && e.target !== menuBtn && !menuBtn.contains(e.target)) {
+        sideMenu.classList.remove('open');
+      }
+    };
+
     // Lista fixa de hospitais salvos no site
     const hospitaisSalvos = [
       {
