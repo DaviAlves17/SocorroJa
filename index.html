@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SocorroJá - Encontre o hospital mais próximo</title>
-  <!-- <link rel="manifest" href="manifest.json"> -->
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -116,11 +115,15 @@
       });
     }
 
-    // Busca automática pela localização e exibe hospitais
+    // Busca automática pela localização e abre o Google Maps com hospitais próximos
     window.onload = function() {
       if ("geolocation" in navigator) {
         navigator.geolocation.getCurrentPosition(function(position) {
-          // Aqui você pode usar a localização para buscar hospitais dinâmicos se quiser
+          // Abre o Google Maps automaticamente com hospitais próximos
+          const lat = position.coords.latitude;
+          const lon = position.coords.longitude;
+          const url = `https://www.google.com/maps/search/hospitais/@${lat},${lon},15z`;
+          window.open(url, "_blank");
           mostrarHospitais();
         }, function(error) {
           document.getElementById('hospitais-lista').innerHTML = "<p>Não foi possível obter sua localização. Exibindo hospitais cadastrados.</p>";
