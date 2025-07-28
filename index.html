@@ -4,75 +4,152 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SocorroJá - Encontre o hospital mais próximo</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --primary: #0a74da;
+      --secondary: #22223b;
+      --danger: #d90429;
+      --success: #28a745;
+      --background: #f4f9fb;
+      --white: #fff;
+      --shadow: 0 4px 16px rgba(10, 116, 218, 0.08);
+      --radius: 14px;
+    }
     body {
-      font-family: Arial, sans-serif;
-      background-color: #f0f8ff;
+      font-family: 'Roboto', Arial, sans-serif;
+      background: var(--background);
       margin: 0;
-      padding: 20px;
+      padding: 0;
+      min-height: 100vh;
     }
-    h1 {
-      color: #0a74da;
+    header {
+      background: var(--primary);
+      color: var(--white);
+      padding: 32px 0 24px 0;
       text-align: center;
+      box-shadow: var(--shadow);
+      border-radius: 0 0 var(--radius) var(--radius);
     }
-    .hospital {
-      background-color: #ffffff;
-      border-radius: 8px;
-      padding: 15px;
-      margin-bottom: 20px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    header h1 {
+      font-family: 'Montserrat', Arial, sans-serif;
+      font-size: 2.5rem;
+      margin: 0;
+      letter-spacing: 1px;
+      font-weight: 700;
     }
-    .hospital h2 {
-      margin-top: 0;
-    }
-    .btn {
-      display: inline-block;
-      margin-top: 10px;
-      padding: 10px 15px;
-      background-color: #0a74da;
-      color: white;
-      text-decoration: none;
-      border-radius: 5px;
-      cursor: pointer;
-      border: none;
-      font-size: 1em;
-    }
-    .btn-tel {
-      background-color: #28a745;
-      margin-left: 10px;
-      font-size: 0.95em;
-      padding: 7px 12px;
+    .container {
+      max-width: 600px;
+      margin: 32px auto;
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 32px 24px 24px 24px;
     }
     .localizacao {
       text-align: center;
-      margin-bottom: 30px;
+      margin-bottom: 32px;
+    }
+    .localizacao p {
+      font-size: 1.1rem;
+      color: #444;
+      margin-bottom: 18px;
+    }
+    .btn {
+      display: inline-block;
+      margin: 8px 6px 0 6px;
+      padding: 12px 22px;
+      background: var(--primary);
+      color: var(--white);
+      text-decoration: none;
+      border-radius: 8px;
+      cursor: pointer;
+      border: none;
+      font-size: 1.08em;
+      font-family: 'Montserrat', Arial, sans-serif;
+      font-weight: 600;
+      transition: background 0.2s, box-shadow 0.2s;
+      box-shadow: 0 2px 8px rgba(10, 116, 218, 0.08);
+    }
+    .btn:hover, .btn:focus {
+      background: #095bb5;
+      outline: none;
+    }
+    .btn-tel {
+      background: var(--success);
+      margin-left: 10px;
+      font-size: 0.98em;
+      padding: 9px 18px;
+    }
+    .btn-tel:hover, .btn-tel:focus {
+      background: #1e7e34;
     }
     .btn-emergencia {
-      background-color: #d90429;
-      margin: 5px 5px 0 5px;
+      background: var(--danger);
+    }
+    .btn-emergencia:hover, .btn-emergencia:focus {
+      background: #a6031e;
     }
     .btn-policia {
-      background-color: #22223b;
-      margin: 5px 5px 0 5px;
+      background: var(--secondary);
     }
-    #hospitais-lista {
-      margin-top: 20px;
+    .btn-policia:hover, .btn-policia:focus {
+      background: #17172b;
+    }
+    .hospital {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 22px 18px 18px 18px;
+      margin-bottom: 28px;
+      box-shadow: 0 2px 10px rgba(10, 116, 218, 0.07);
+      border-left: 6px solid var(--primary);
+      transition: box-shadow 0.2s;
+    }
+    .hospital:hover {
+      box-shadow: 0 6px 24px rgba(10, 116, 218, 0.13);
+    }
+    .hospital h2 {
+      margin-top: 0;
+      font-family: 'Montserrat', Arial, sans-serif;
+      font-size: 1.3rem;
+      color: var(--primary);
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .hospital p {
+      margin: 7px 0;
+      color: #333;
+      font-size: 1.04em;
+    }
+    .hospital .btn {
+      margin-top: 12px;
+    }
+    @media (max-width: 700px) {
+      .container {
+        margin: 16px 4px;
+        padding: 18px 6px 12px 6px;
+      }
+      header {
+        padding: 22px 0 14px 0;
+      }
     }
   </style>
 </head>
 <body>
-  <h1>SocorroJá</h1>
-
-  <div class="localizacao">
-    <p><strong>Buscando hospitais próximos...</strong></p>
-    <button type="button" class="btn btn-emergencia" onclick="window.location.href='tel:192'">Ligar para o SAMU (192)</button>
-    <button type="button" class="btn btn-policia" onclick="window.location.href='tel:190'">Ligar para a Polícia (190)</button>
+  <header>
+    <h1>SocorroJá</h1>
+    <p style="font-size:1.15rem;font-weight:500;margin-top:10px;opacity:.95;">Encontre rapidamente hospitais e serviços de emergência próximos</p>
+  </header>
+  <div class="container">
+    <div class="localizacao">
+      <p><strong>Buscando hospitais próximos...</strong></p>
+      <button type="button" class="btn btn-emergencia" onclick="window.location.href='tel:192'">Ligar para o SAMU (192)</button>
+      <button type="button" class="btn btn-policia" onclick="window.location.href='tel:190'">Ligar para a Polícia (190)</button>
+    </div>
+    <div id="hospitais-lista">
+      <!-- Lista de hospitais será exibida aqui -->
+    </div>
   </div>
-
-  <div id="hospitais-lista">
-    <!-- Lista de hospitais será exibida aqui -->
-  </div>
-
   <script>
     // Lista fixa de hospitais salvos no site
     const hospitaisSalvos = [
@@ -106,10 +183,10 @@
           <p><strong>Endereço:</strong> ${hospital.endereco}</p>
           <p>
             <strong>Telefone:</strong> ${hospital.telefone}
-            <a href="${hospital.telLink}" class="btn btn-tel">Ligar</a>
+            <a href="${hospital.telLink}" class="btn btn-tel" title="Ligar para ${hospital.nome}">Ligar</a>
           </p>
           <p><strong>Horário de Atendimento:</strong> ${hospital.horario}</p>
-          <a href="${hospital.rota}" target="_blank" class="btn">Ver Rota no Mapa</a>
+          <a href="${hospital.rota}" target="_blank" class="btn" title="Ver rota no Google Maps">Ver Rota no Mapa</a>
         `;
         lista.appendChild(div);
       });
@@ -126,11 +203,11 @@
           window.open(url, "_blank");
           mostrarHospitais();
         }, function(error) {
-          document.getElementById('hospitais-lista').innerHTML = "<p>Não foi possível obter sua localização. Exibindo hospitais cadastrados.</p>";
+          document.getElementById('hospitais-lista').innerHTML = "<p style='color:#d90429;text-align:center;'>Não foi possível obter sua localização. Exibindo hospitais cadastrados.</p>";
           mostrarHospitais();
         });
       } else {
-        document.getElementById('hospitais-lista').innerHTML = "<p>Seu navegador não suporta geolocalização. Exibindo hospitais cadastrados.</p>";
+        document.getElementById('hospitais-lista').innerHTML = "<p style='color:#d90429;text-align:center;'>Seu navegador não suporta geolocalização. Exibindo hospitais cadastrados.</p>";
         mostrarHospitais();
       }
     };
