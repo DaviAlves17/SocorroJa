@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SocorroJá - Encontre o hospital mais próximo</title>
-  <link rel="manifest" href="manifest.json">
+  <!-- <link rel="manifest" href="manifest.json"> -->
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -42,6 +42,14 @@
       text-align: center;
       margin-bottom: 30px;
     }
+    .btn-emergencia {
+      background-color: #d90429;
+      margin: 5px 5px 0 5px;
+    }
+    .btn-policia {
+      background-color: #22223b;
+      margin: 5px 5px 0 5px;
+    }
   </style>
 </head>
 <body>
@@ -51,6 +59,9 @@
     <p><strong>Sua localização:</strong></p>
     <p id="coords">Carregando...</p>
     <button type="button" onclick="buscarHospitais()" class="btn">Ver hospitais próximos</button>
+    <br><br>
+    <button type="button" class="btn btn-emergencia" onclick="window.location.href='tel:192'">Ligar para o SAMU (192)</button>
+    <button type="button" class="btn btn-policia" onclick="window.location.href='tel:190'">Ligar para a Polícia (190)</button>
   </div>
 
   <div class="hospital">
@@ -101,5 +112,3 @@
       }
     }
   </script>
-</body>
-</html>
